@@ -89,12 +89,7 @@ class LearningAgent(Agent):
         ###########
         # Calculate the maximum Q-value of all actions for a given state
 
-        maxQ = None
-        for (state_action, q_value) in self.Q[state].items():
-            if maxQ == None:
-                maxQ = q_value
-            elif q_value > maxQ:
-                maxQ = q_value
+        maxQ = max(self.Q[state].values())
 
         return maxQ 
 
@@ -108,11 +103,9 @@ class LearningAgent(Agent):
         # When learning, check if the 'state' is not in the Q-table
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
-        if self.learning:
-            if not self.Q.has_key(state):
-                self.Q[state] = dict()
-                for action in self.valid_actions:
-                    self.Q[state][action] = 0.0
+        
+        if self.learning and state not in self.Q.keys():
+            self.Q[state] = {a : 0.0 for a in self.valid_actions}
 
         return
 
@@ -139,20 +132,23 @@ class LearningAgent(Agent):
             if randnum < self.epsilon:
                 action = random.choice(self.valid_actions)
             else:
-                max_Q_value = None
-                actionList = []
-                for (state_action, q_value) in self.Q[state].items():
-                    if max_Q_value == None:
-                        actionList = [state_action]
-                        max_Q_value = q_value
-                    elif q_value > max_Q_value:
-                        actionList = [state_action]
-                        max_Q_value = q_value
-                    elif q_value == max_Q_value:
-                        actionList.append(state_action)
+                # max_Q_value = None
+                # actionList = []
+                # for (state_action, q_value) in self.Q[state].items():
+                #     if max_Q_value == None:
+                #         actionList = [state_action]
+                #         max_Q_value = q_value
+                #     elif q_value > max_Q_value:
+                #         actionList = [state_action]
+                #         max_Q_value = q_value
+                #     elif q_value == max_Q_value:
+                #         actionList.append(state_action)
+                # action = random.choice(actionList)
+                actionList = [action for action in self.valid_actions \
+                                if self.Q[state][action] == self.get_maxQ(state)]
                 action = random.choice(actionList)
 
-                print "take {} action, Q-value {}, waypoint {}".format(action, max_Q_value, self.next_waypoint)
+                #print "take {} action, Q-value {}, waypoint {}".format(action, max_Q_value, self.next_waypoint)
  
         return action
 
